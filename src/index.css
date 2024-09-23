@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background: linear-gradient(to top,#3a214f,#8512fa);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -35,6 +35,11 @@ h1 {
   line-height: 1.1;
 }
 
+button {
+  cursor: pointer;
+}
+
+
 .button-group {
   display: flex;
   justify-content: center;
@@ -48,8 +53,7 @@ h1 {
   padding: 15px 25px;
   font-family: inherit;
   font-size: 20px;
-  background-color: #3b3b3b;
-  cursor: pointer;
+  background-color: #969494;
   transition: border-color 0.25s;
 }
 .btn:hover {
@@ -67,13 +71,29 @@ h1 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 10px;
+  margin: 10px;
 }
 
 .name-container {
   display: flex;
   flex-direction: row;
+  text-align: left;
+  justify-content: left;
   gap: 10px;
-  padding: 0;
+  padding-left: 5px;
+  background-color: #8d30eb;
+  border: 0;
+  border-radius: 4px;
+}
+
+.small-btn {
+  background-color: #8512fa;
+  border: 0;
+  border-radius: 4px;
+  width: 25px;
+  height: 25px;
+  /* margin-right: 100px; */
+  margin-left: 0px;
 }
 
 .name {
@@ -96,6 +116,11 @@ h1 {
 
 .btn-blue {
   background-color: #4fb9e3;
+}
+
+.winner-name {
+  font-size: 70px;
+  font-weight: 500;
 }
 
 @media (prefers-color-scheme: light) {
