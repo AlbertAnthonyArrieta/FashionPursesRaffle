@@ -1,125 +1,85 @@
-import './App.css';
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Logo from './assets/fashionpurses.png';
+import "./App.css";
+import Logo from "./assets/fashionpurses.png";
+import { useState } from "react";
 
 function App() {
-  const [names, setNames] = useState([]);
-  const [input, setInput] = useState('');
-  const [winner, setWinner] = useState(null);
-  const [homepage, setHomepage] = useState(true);
-  const [currentItem, setCurrentItem] = useState('');
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [inputText, setInputText] = useState("");
+  const [outputText, setOutputText] = useState("");
 
-  const handleAddNames = () => {
-    const nameEntries = input.split('\n');
-    const validNames = nameEntries
-      .map(name => {
-        const nameWithoutNumber = name.replace(/^\d+\.\s*/, '');
-        return nameWithoutNumber.trim();
-      })
-      .filter(name => name.endsWith('❤️❤️❤️'))
-      .map(name => name.replace(' ❤️❤️❤️', ''));
+  const handleProcess = () => {
+    const lines = inputText.split("\n");
+    const entries = {};
 
-    setNames(prevList => [...prevList, ...validNames]);
-    setInput('');
+    // Parse each line for entries
+    lines.forEach((line) => {
+      const match = line.match(/^(\d+)\.\s*(.+?)(❤️❤️❤️)?$/);
+      if (match) {
+        const number = parseInt(match[1]);
+        const name = match[2].trim();
+        entries[number] = match[3] ? name : "";
+      }
+    });
+
+    // Create output for numbers 1 to 100
+    const result = Array.from({ length: 100 }, (_, i) => {
+      const number = i + 1;
+      return `${number}. ${entries[number] || ""}`;
+    });
+
+    setOutputText(result.join("\n"));
   };
 
-  const deleteName = (index) => {
-    return () => {
-      const newNames = [...names];
-      newNames.splice(index, 1);
-      setNames(newNames);
-    };
-  };
-
-  useEffect(() => {
-    let interval;
-
-    if (isSpinning) {
-      interval = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * names.length);
-        setCurrentItem(names[randomIndex]);
-      }, 100);
-    }
-
-    return () => clearInterval(interval);
-  }, [isSpinning, names]);
-
-  const startRaffle = () => {
-    if (names.length === 0) return;
-    setHomepage(false);
-
-    setIsSpinning(true);
-
-    setTimeout(() => {
-      setIsSpinning(false);
-      const randomWinner = names[Math.floor(Math.random() * names.length)];
-      setWinner(randomWinner);
-      setNames(list => list.filter(name => name !== randomWinner)); 
-    }, 6000); 
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(outputText).then(() => {
+      alert("Copied to clipboard!");
+    }).catch(err => {
+      console.error("Failed to copy text: ", err);
+    });
   };
 
   return (
-    <>
-      {homepage ? (
-        <>
-          <img src={Logo} width="300px" alt="Fashion Purses Logo" />
-          <div className="page-content">
-            <div className="list">
-              {names.map((name, index) => (
-                <div key={index} className="name-container">
-                  <p className="name">{name}</p>
-                  <button className="small-btn" onClick={deleteName(index)}>X</button>
-                </div>
-              ))}
-            </div>
-            <div className="form">
-              <textarea
-                rows={20}
-                cols={100}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Enter names here..."
-              />
-            </div>
-            <div className="button-group">
-              <button onClick={handleAddNames} className="btn btn-blue">Add</button>
-              {names.length === 0 ? null : <button onClick={() => setNames([])} className="btn btn-red">Clear Names</button>}
-              {names.length === 0 ? null : <button onClick={startRaffle} className="btn btn-green">Start Raffle</button>}
-            </div>
+    <div className="page-content">
+      <div className="header">
+        <img src={Logo} width="300px" alt="Fashion Purses Logo" />
+        <div>
+          <p>Entries must have a number, name, and 3 Hearts (❤️❤️❤️) </p>
+          <div className="example">
+            Example:<br />
+            1. Elvie Chiong ❤️❤️❤️<br />
+            2. Marvie Chiong ❤️❤️❤️<br />
+            3. Ashley Chiong
           </div>
-        </>
-      ) : (
-        <>
-          <h1>The Winner is...</h1>
-          {isSpinning ? (
-            <motion.h1
-              key={currentItem}
-              animate={{ opacity: [0, 1], y: [10, -10] }}
-              transition={{ duration: 0.3 }}
-              style={{ fontSize: '2rem', marginTop: '20px' }}
-            >
-              {currentItem}
-            </motion.h1>
-          ) : (
-            <motion.h2
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="winner-name"
-            >
-              🎉{winner}🎉
-            </motion.h2>
-          )}
-
-          <div className="button-group">
-            <button className="btn" onClick={() => setHomepage(true)}>Back to Home</button>
-            <button className="btn btn-green" onClick={startRaffle}>Pick another!</button>
-          </div>
-        </>
-      )}
-    </>
+        </div>
+      </div>
+      <div className="form">
+        <div className="form-section">
+          <h2>Input</h2>
+          <textarea
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            rows="20"
+            cols="60"
+            placeholder="Enter your list here"
+          />
+          <button className="btn btn-blue" onClick={handleProcess}>
+            Convert
+          </button>
+        </div>
+        <div className="form-section">
+          <h2>Result</h2>
+          <textarea
+            value={outputText}
+            readOnly
+            rows="20"
+            cols="60"
+            placeholder="Processed output will appear here"
+          />
+          <button className="btn btn-green" onClick={handleCopyToClipboard}>
+            Copy to Clipboard
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
